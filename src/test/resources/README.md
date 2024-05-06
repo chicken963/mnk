@@ -1,0 +1,1 @@
+CSV content imitates field state (x - struck, o - not struck yet)
