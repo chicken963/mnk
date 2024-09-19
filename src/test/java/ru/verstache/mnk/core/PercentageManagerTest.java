@@ -11,6 +11,9 @@ import ru.verstache.mnk.manager.StrokeLinesManager;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PercentageManagerTest {
@@ -25,7 +28,7 @@ public class PercentageManagerTest {
     @ParameterizedTest
     @MethodSource("percents_for_1_line_streak")
     public void shouldComputeWinningPercentage_when4x4_and_1lineStreak(Double expectedPercentage, Field field) {
-        Assertions.assertEquals(String.format("%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 1));
+        Assertions.assertEquals( String.format(Locale.US,"%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 1));
     }
 
 
@@ -45,7 +48,7 @@ public class PercentageManagerTest {
     @ParameterizedTest
     @MethodSource("percents_for_3_line_streak_4x4")
     public void shouldComputeWinningPercentage_when4x4_and_3lineStreak(Double expectedPercentage, Field field) {
-        Assertions.assertEquals(String.format("%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
     }
 
 
@@ -61,7 +64,7 @@ public class PercentageManagerTest {
     @ParameterizedTest
     @MethodSource("percents_for_3_line_streak_5x5")
     public void shouldComputeWinningPercentage_when5x5_and_3lineStreak(Double expectedPercentage, Field field) {
-        Assertions.assertEquals(String.format("%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
     }
 
 
@@ -75,13 +78,13 @@ public class PercentageManagerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("percents_for_3_line_streak_nonSquare")
-    public void shouldComputeWinningPercentage_whenNonSquare_and_3lineStreak(Double expectedPercentage, Field field) {
-        Assertions.assertEquals(String.format("%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
+    @MethodSource("percents_for_3_line_streak_horizontal")
+    public void shouldComputeWinningPercentage_whenHorizontal_and_3lineStreak(Double expectedPercentage, Field field) {
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
     }
 
 
-    public static Stream<Arguments> percents_for_3_line_streak_nonSquare() {
+    public static Stream<Arguments> percents_for_3_line_streak_horizontal() {
         File dir = new File("src/test/resources/field_states/3_lines_percentage/horizontal");
         File[] files = dir.listFiles();
         assert files != null;
@@ -89,6 +92,44 @@ public class PercentageManagerTest {
         return Arrays.stream(files)
                 .map(file -> Arguments.of(extractExpectedPercentageFromNameByParts(file), StruckManagerTestUtils.mapToField(file)));
     }
+
+    @ParameterizedTest
+    @MethodSource("percents_for_3_line_streak_vertical")
+    public void shouldComputeWinningPercentage_whenVertical_and_3lineStreak(Double expectedPercentage, Field field) {
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
+    }
+
+
+    public static Stream<Arguments> percents_for_3_line_streak_vertical() {
+        File dir = new File("src/test/resources/field_states/3_lines_percentage/vertical");
+        File[] files = dir.listFiles();
+        assert files != null;
+
+        return Arrays.stream(files)
+                .map(file -> Arguments.of(extractExpectedPercentageFromNameByParts(file), StruckManagerTestUtils.mapToField(file)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("percents_for_3x2")
+    public void shouldComputeWinningPercentage_when3x2(Field field, Double expectedPercentage) {
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 1));
+    }
+
+    public static Stream<Arguments> percents_for_3x2() {
+        File dir = new File("src/test/resources/field_states/3x2");
+        File[] files = dir.listFiles();
+        assert files != null;
+
+        Map<Double, Field> testFields = Arrays.stream(files)
+                .collect(Collectors.toMap(
+                        file -> Double.valueOf(StruckManagerTestUtils.getExpectedNumberOfStruckLines(file)) / 6,
+                        StruckManagerTestUtils::mapToField));
+
+        return testFields.entrySet()
+                .stream()
+                .map(entry -> Arguments.of(entry.getValue(), entry.getKey()));
+    }
+
 
     private static Double extractExpectedPercentageFromNameByParts(File file) {
         String[] parts = file.getName().split("_of_");

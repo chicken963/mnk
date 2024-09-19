@@ -1,22 +1,22 @@
 package ru.verstache.mnk.core;
 
 public interface Cell extends Comparable<Cell> {
-    int getX();
+    int getRowIndex();
 
-    int getY();
+    int getColumnIndex();
 
     boolean isStruck();
 
     default boolean equals(Cell another) {
-        return getX() == another.getX() && getY() == another.getY();
+        return getRowIndex() == another.getRowIndex() && getColumnIndex() == another.getColumnIndex();
     }
 
     @Override
     default int compareTo(Cell o) {
-        if (getX() != o.getX()) {
-            return getX() - o.getX();
+        if (getRowIndex() != o.getRowIndex()) {
+            return getRowIndex() - o.getRowIndex();
         }
-        return getY() - o.getY();
+        return getColumnIndex() - o.getColumnIndex();
     }
 
 }

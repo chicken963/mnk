@@ -94,12 +94,12 @@ public class StruckManagerTestUtils {
                 int finalColumnIndex = columnIndex;
                 cells.add(new Cell() {
                     @Override
-                    public int getX() {
+                    public int getRowIndex() {
                         return finalRowIndex;
                     }
 
                     @Override
-                    public int getY() {
+                    public int getColumnIndex() {
                         return finalColumnIndex;
                     }
 
@@ -161,11 +161,11 @@ public class StruckManagerTestUtils {
     }
 
     static void assertEqual(Cell expectedCell, Cell actualCell) {
-        assertEquals(actualCell.getX(), expectedCell.getX());
-        assertEquals(actualCell.getY(), expectedCell.getY());
+        assertEquals(actualCell.getRowIndex(), expectedCell.getRowIndex());
+        assertEquals(actualCell.getColumnIndex(), expectedCell.getColumnIndex());
     }
 
     static boolean areEqual(Cell expectedCell, Cell actualCell) {
-        return actualCell.getX() == expectedCell.getX() && actualCell.getY() == expectedCell.getY();
+        return actualCell.getRowIndex() == expectedCell.getRowIndex() && actualCell.getColumnIndex() == expectedCell.getColumnIndex();
     }
 }

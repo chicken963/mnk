@@ -19,7 +19,7 @@ public interface Field {
 
     default List<Line> getRows() {
         return getCells().stream()
-                .collect(Collectors.groupingBy(Cell::getX))
+                .collect(Collectors.groupingBy(Cell::getRowIndex))
                 .values().stream()
                 .map(Row::new)
                 .collect(Collectors.toList());
@@ -27,7 +27,7 @@ public interface Field {
 
     default List<Line> getColumns() {
         return getCells().stream()
-                .collect(Collectors.groupingBy(Cell::getY))
+                .collect(Collectors.groupingBy(Cell::getColumnIndex))
                 .values().stream()
                 .map(Column::new)
                 .collect(Collectors.toList());
@@ -67,32 +67,50 @@ public interface Field {
     default Cell getCell(int rowIndex, int columnIndex) {
         if (columnIndex >= getWidth()) {
             throw new IndexOutOfBoundsException(
-                    String.format("Invalid row index - value %d exceeds maximum allowed index %d", columnIndex, getWidth() - 1));
+                    String.format("Thread %s: Invalid column index - value %d exceeds maximum allowed index %d", Thread.currentThread().getName(), columnIndex, getWidth() - 1));
         }
         if (rowIndex >= getHeight()) {
             throw new IndexOutOfBoundsException(
-                    String.format("Invalid column index - value %d exceeds maximum allowed index %d", rowIndex, getHeight() - 1));
+                    String.format("Thread %s: Invalid row index - value %d exceeds maximum allowed index %d", Thread.currentThread().getName(), rowIndex, getHeight() - 1));
         }
-        return getCells().get(rowIndex * getWidth() + columnIndex);
+        return getCells().stream()
+                .filter(cell -> rowIndex == cell.getRowIndex() && columnIndex == cell.getColumnIndex())
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No cell found with row index " + rowIndex + " and column index " + columnIndex));
     }
 
     private int getDiagonalLength() {
         return Math.min(getHeight(), getWidth());
     }
 
+
+    /**
+     * seed cells are chosen according to the following schema:
+     *
+     * vhhooohhv
+     * vooooooov
+     * vooooooov
+     * ooooooooo
+     * ooooooooo
+     *
+     * where v - 'vertical' cells
+     *       h - 'horizontal' cells
+     * @param type diagonal type
+     * @return stream of seed cells
+     */
     private Stream<Cell> getSeedCells(DiagonalType type) {
         int seedCornerHeight = getHeight() - getDiagonalLength();
         int seedCornerWidth = getWidth() - getDiagonalLength();
-
+        int seedColumnIndex = type.getSeedColumnIndex(getWidth());
         Stream<Cell> verticalCells = IntStream.range(0, seedCornerHeight + 1)
-                .mapToObj(rowIndex -> getCell(rowIndex, type.getSeedColumnIndex(getWidth())));
+                .mapToObj(rowIndex -> getCell(rowIndex, seedColumnIndex));
         Stream<Cell> horizontalCells = IntStream.range(1, seedCornerWidth + 1)
                 .mapToObj(columnIndex -> getCell(0, type.getSeedColumnIndex(getWidth(), columnIndex)));
         return Stream.concat(verticalCells, horizontalCells).distinct();
     }
 
     private Diagonal getDiagonal(Cell seedCell, DiagonalType type) {
-        return getDiagonal(seedCell.getX(), seedCell.getY(), type);
+        return getDiagonal(seedCell.getRowIndex(), seedCell.getColumnIndex(), type);
     }
 
     private Diagonal getDiagonal(int seedRowIndex, int seedColumnIndex, DiagonalType type) {

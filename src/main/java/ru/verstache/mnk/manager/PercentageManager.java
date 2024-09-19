@@ -18,7 +18,7 @@ public class PercentageManager {
         double percentage = getAllNLengthSubsets(field, targetLinesCount)
                 .map(lineset -> this.countStrokePercentage(lineset, field, cells))
                 .max(Double::compareTo).orElse(0d);
-        return String.format("%.2f", percentage * 100);
+        return String.format(Locale.US, "%.2f", percentage * 100);
     }
 
 
@@ -79,7 +79,7 @@ public class PercentageManager {
 
     private static Collector<Cell, ?, Map<Integer, Cell>> mergingSamePosition(Field field) {
         return Collectors.toMap(
-                cell -> cell.getY() * field.getWidth() + cell.getX(),
+                cell -> cell.getRowIndex() * field.getWidth() + cell.getColumnIndex(),
                 Function.identity(),
                 (a, b) -> b);
     }

@@ -10,6 +10,7 @@ import ru.verstache.mnk.manager.PercentageManager;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class PercentageManagerTestFull {
@@ -40,7 +41,7 @@ public class PercentageManagerTestFull {
     @ParameterizedTest
     @MethodSource("percents_for_3_line_streak_5x5")
     public void shouldComputeWinningPercentage_when5x5_and_3lineStreak(Double expectedPercentage, Field field) {
-        Assertions.assertEquals(String.format("%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
     }
 
 
@@ -56,7 +57,7 @@ public class PercentageManagerTestFull {
     @ParameterizedTest
     @MethodSource("percents_for_3_line_streak_nonSquare")
     public void shouldComputeWinningPercentage_whenNonSquare_and_3lineStreak(Double expectedPercentage, Field field) {
-        Assertions.assertEquals(String.format("%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
+        Assertions.assertEquals(String.format(Locale.US, "%.2f", expectedPercentage * 100), uut.countWinningPercentage(field, 3));
     }
 
 

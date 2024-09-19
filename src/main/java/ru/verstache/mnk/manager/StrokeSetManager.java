@@ -2,7 +2,6 @@ package ru.verstache.mnk.manager;
 
 import ru.verstache.mnk.core.Cell;
 import ru.verstache.mnk.core.Field;
-import ru.verstache.mnk.core.Line;
 import ru.verstache.mnk.core.SubLine;
 
 import java.util.Collection;
@@ -20,7 +19,7 @@ public class StrokeSetManager {
                 .map(SubLine::getCells)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toMap(
-                        cell -> cell.getY() * field.getWidth() + cell.getX(),
+                        cell -> cell.getRowIndex() * field.getWidth() + cell.getColumnIndex(),
                         Function.identity(),
                         (a, b) -> b))
                 .values());
